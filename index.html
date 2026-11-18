@@ -1,0 +1,63 @@
+<!doctype html>
+<html>
+<head>
+<meta charset="utf-8">
+<title>Lapse</title>
+<style>
+  body { background:#050807; color:#3dff8e; font-family: ui-monospace, Menlo, Consolas, monospace;
+         margin:0; padding:12px; }
+  #top-bar-text { font-size:16px; color:#8aa0b8; margin-bottom:8px; }
+  #console { white-space:pre-wrap; font-size:14px; line-height:1.35;
+             background:#0b0d10; color:#c1c2c5; padding:12px; border-radius:6px;
+             min-height:200px; }
+  #status { font-size:18px; margin-top:10px; }
+</style>
+</head>
+<body>
+<div id="top-bar-text">Lapse &mdash; 14.23 reachability probe</div>
+<pre id="console"></pre>
+<div id="status">booting...</div>
+
+<!-- classic parse-time scripts: define globals (int64, rop, syscalls, main/prepare) -->
+<script src="int64.js"></script>
+<script src="rop.js"></script>
+<script src="syscalls.js"></script>
+<script src="brand.js"></script>
+<script src="main.js"></script>
+
+<script>
+function plog(s) {
+  var el = document.getElementById('console');
+  el.textContent += s + "\n";
+  el.scrollTop = el.scrollHeight;
+}
+function pstat(s) { document.getElementById('status').textContent = s; }
+</script>
+
+<!-- module glue: run the desync, install the primitive, boot main -->
+<script type="module">
+import { establishPrimitive } from "./core.js";
+import { installWindowP } from "./mem.js";
+
+plog("[glue] firmware " + (window.fw_str || "?") + " - establishing primitive...");
+pstat("running desync trigger (auto-retry)...");
+
+try {
+  const carrier = await establishPrimitive({
+    onEvent: function (e) {
+      try { plog("[core] " + (e && e.stage ? e.stage : JSON.stringify(e)).slice(0, 160)); } catch (x) {}
+    }
+  });
+  plog("[glue] primitive established - carrier ready");
+  installWindowP(carrier);
+  plog("[glue] window.p installed - calling main()");
+  pstat("primitive ready - booting main...");
+  await main(globalThis.p);
+  pstat("main() returned");
+} catch (e) {
+  plog("[glue] FAILED: " + e);
+  pstat("failed - see console");
+}
+</script>
+</body>
+</html>
