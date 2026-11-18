@@ -1,4 +1,4 @@
-if (!navigator.userAgent.includes('PlayStation 5')) {
+﻿if (!navigator.userAgent.includes('PlayStation 5')) {
     alert(`This is a PlayStation 5 Exploit. => ${navigator.userAgent}`);
     throw new Error("");
 }
@@ -11,7 +11,7 @@ const supportedFirmwares = [
     "8.40", "8.60", "9.00", "9.05", "9.20", "9.40", "9.60", "10.00", "10.01",
     "10.20", "10.40", "10.60", "11.00", "11.20", "11.40", "11.60",
     "12.00", "12.02", "12.20", "12.40", "12.60", "12.70", "13.00",
-    "13.20", "13.60"
+    "13.20", "13.60", "14.23"
 ];
 // 13.60 joined 2026-09-15 for the USERLAND half only. Its profile (offsets/13.60.js)
 // carries the WebKit/LK layer but NO OFFSET_KERNEL_*, so prepare() and the worker ROP
